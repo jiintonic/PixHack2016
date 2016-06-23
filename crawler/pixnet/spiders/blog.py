@@ -4,6 +4,7 @@ import sys
 import time
 import datetime
 from BeautifulSoup import BeautifulSoup
+from BeautifulSoup import Tag
 
 from pixnet.items import PixnetItem
 
@@ -113,14 +114,35 @@ class BlogSpider(scrapy.Spider):
 
     def _extract_content(self, response):
         article = ""
+
         for line in response.xpath('//p').extract():
-            raw_text = unicode(BeautifulSoup(line).text) + '\n'
+            soup = BeautifulSoup(line)
+            if self._need_skip_line(soup.p):
+                continue
+
+            raw_text = unicode(soup.text) + '\n'
             if raw_text.startswith("Skip to article") \
                 or raw_text.startswith("Global blog category"):
                 continue
             elif raw_text.startswith("Posted by"):
                 break
+            elif raw_text.strip() == '':
+                continue
             else:
                 article += raw_text
+                print raw_text
 
         return article
+
+    def _need_skip_line(self, soup):
+        if type(soup.contents[0]) is Tag:
+            if soup.contents[0].name == 'a' :
+                return True
+            elif soup.contents[0].name == 'img':
+                return True
+            else:
+                return False
+        elif soup.find('script') is not None:
+            return True
+        else:
+            return False
