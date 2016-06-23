@@ -5,7 +5,7 @@ output/
 ### Java ###
 *.class
 
-# package files 
+# package files
 *.jar
 *.war
 *.ear
@@ -156,3 +156,12 @@ crashlytics-build.properties
 
 # workspace files are user-specific
 *.sublime-workspace
+
+# sqlite db
+*.db
+
+# python
+*.pyc
+
+# crawler
+articles/
