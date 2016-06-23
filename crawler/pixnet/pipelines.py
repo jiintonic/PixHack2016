@@ -34,12 +34,44 @@ class SqlitePipeline(object):
         cursor.execute(sqlContext)
         self.sql_conn.commit()
 
+    def _tags_to_string(self, tags):
+        tag_str = ""
+        for tag in tags:
+            tag_str += tag + ','
+
+        tag_str = tag_str[0:-1]
+        return tag_str
+
+    def _store_aritcle(self, item):
+        c = self.sql_conn.cursor()
+
+        row_data = [(
+            item['title'], \
+            item['link'], \
+            item['content'], \
+            self._tags_to_string(item['tags']), \
+            item['pixnet_category'], \
+            item['personal_category'], \
+            0, \
+            item['article_id'], \
+            item['date'] \
+        )]
+
+        c.executemany('INSERT INTO pixnet_aritcles VALUES (?,?,?,?,?,?,?,?,?)', \
+            row_data)
+
+        self.sql_conn.commit()
+        return
+
     # Scrapy Pipline
     def process_item(self, item, spider):
-        c = self.sql_conn.cursor()
+
 
         for k, v in item.items():
             print k, v
+
+        self._store_aritcle(item)
+
         return item
 
     def open_spider(self, spider):
