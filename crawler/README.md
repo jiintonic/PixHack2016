@@ -10,5 +10,5 @@
 Use below command to start crawling.
 
 ```sh
-scrapy crawler blog
+scrapy crawl blog
 ```
