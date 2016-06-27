@@ -2,6 +2,7 @@ import sqlite3
 import os
 import re
 import logging
+import time
 
 class PixnetDB(object):
     sql_files = {
@@ -32,16 +33,6 @@ class PixnetDB(object):
         dirname = os.path.dirname(os.path.realpath(__file__))
         return os.path.join(dirname, 'sql', name)
 
-    def exist_author(self, author_id):
-        c = self.sql_conn.cursor()
-        c.execute("SELECT * FROM pixnet_aritcles WHERE author_id = ?", (author_id, ))
-
-        data = c.fetchone()
-        if data is None:
-            return False
-        else:
-            return True
-
     def exist_article_link(self, link):
         c = self.sql_conn.cursor()
         c.execute("SELECT link FROM pixnet_aritcles WHERE link = ?", (link, ))
@@ -52,28 +43,100 @@ class PixnetDB(object):
         else:
             return True
 
+    def exist_article_id(self, article_id):
+        c = self.sql_conn.cursor()
+        c.execute("SELECT link FROM pixnet_aritcles WHERE article_id = ?", (article_id, ))
+
+        data = c.fetchone()
+        if data is None:
+            return False
+        else:
+            return True
+
     def store_article_data(self, data):
         c = self.sql_conn.cursor()
-        if self.exist_article_link(data[1]):
+        link = data[1]
+
+        if self.exist_article_link(link):
             pass
         else:
-            c.execute("insert into pixnet_aritcles values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+            c.execute("INSERT INTO pixnet_aritcles VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
             self.sql_conn.commit()
 
-    def get_all_aritcles_data(self):
+    def get_all_aritcle_data(self):
         c = self.sql_conn.cursor()
         c.execute("SELECT * FROM pixnet_aritcles")
         return c.fetchall()
 
-    def get_articles_data(self, colname, condition):
+    def get_article_data(self, article_id):
         c = self.sql_conn.cursor()
-        if re.match('\w+', colname):
-            sql = "SELECT * FROM pixnet_aritcles WHERE %s = ?" % (colname)
+
+        sql = "SELECT * FROM pixnet_aritcles WHERE article_id = ?"
+        c.execute(sql, (article_id, ))
+        return c.fetchone()
+
+    def get_articles_by(self, column, condition):
+        c = self.sql_conn.cursor()
+        if re.match('[\w_]+', column):
+            sql = "SELECT content FROM pixnet_aritcles WHERE %s = ?" % (column)
             c.execute(sql, (condition, ))
             return c.fetchall()
         else:
             logging.error("Column name contains invalid characters.")
             return None
+
+    def delete_article_data(self, article_id):
+        c = self.sql_conn.cursor()
+        sql = "DELETE FROM pixnet_aritcles WHERE article_id = ?"
+        c.execute(sql, (article_id, ))
+        self.sql_conn.commit()
+
+    def exist_author(self, author_id):
+        c = self.sql_conn.cursor()
+        c.execute("SELECT * FROM pixnet_authors WHERE author_id = ?", (author_id, ))
+
+        data = c.fetchone()
+        if data is None:
+            return False
+        else:
+            return True
+
+    def store_author_data(self, data):
+        c = self.sql_conn.cursor()
+        author_id = data[0]
+
+        if self.exist_author(author_id):
+            self.update_author_data(data)
+        else:
+            c.execute("INSERT INTO pixnet_authors VALUES (?, ?, ?, ?, ?, ?, ?)", data)
+            self.sql_conn.commit()
+
+    def get_all_author_data(self):
+        c = self.sql_conn.cursor()
+        c.execute("SELECT * FROM pixnet_authors")
+        return c.fetchall()
+
+    def get_author_data(self, author_id):
+        c = self.sql_conn.cursor()
+        sql = "SELECT * FROM pixnet_authors WHERE author_id = ?"
+        c.execute(sql, (author_id, ))
+        return c.fetchone()
+
+    def update_author_data(self, data):
+        sql = "UPDATE pixnet_authors SET last_update_date = ?, last_article_link = ? WHERE author_id = ?"
+        c = self.sql_conn.cursor()
+        author_id = data[0]
+        last_update = data[5]
+        last_article_link = data[6]
+
+        c.execute(sql, (last_update, last_article_link, author_id))
+        self.sql_conn.commit()
+
+    def delete_author_data(self, author_id):
+        c = self.sql_conn.cursor()
+        sql = "DELETE FROM pixnet_authors WHERE author_id = ?"
+        c.execute(sql, (author_id, ))
+        self.sql_conn.commit()
 
     def close(self):
         self.sql_conn.close()
