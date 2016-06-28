@@ -119,6 +119,8 @@ class BlogSpider(scrapy.Spider):
             soup = BeautifulSoup(line)
             if self._need_skip_line(soup.p):
                 continue
+            elif 'script' in line:
+                continue
 
             raw_text = unicode(soup.text) + '\n'
             if raw_text.startswith("Skip to article") \
