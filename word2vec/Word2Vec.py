@@ -34,14 +34,16 @@ def loadModel(modelName):
 
 def usingModel(model):
     similarity = raw_input("Input word:")
+    print model[similarity]
     print('most_similar:' +similarity)
     for w in model.most_similar(similarity, topn=5):
        print w[0], w[1]
 
 def fromArticleFile():
     sentences = MySentences('scrapy_wiki/') # a memory-friendly iterator
-    model = gensim.models.word2vec.Word2Vec(sentences, size=200, window=8, min_count=1, sample=0.001,\
-                                            sg=0, hs=1, negative=0, cbow_mean=1, workers=3, iter=3)
+    model = gensim.models.word2vec.Word2Vec(sentences, size=200, window=4, min_count=1, sg=0,\
+                                            hs=1, negative=0, cbow_mean=1, workers=3, iter=5,\
+                                            sored_vocab=1, batch_words=5000)
     saveModel(model, model_name)
 
 def fromSavedModel():
@@ -49,5 +51,5 @@ def fromSavedModel():
     usingModel(new_model)
 
 
-# fromArticleFile()
-fromSavedModel()
+fromArticleFile()
+# fromSavedModel()
