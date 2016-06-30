@@ -23,12 +23,18 @@ function start_jieba() {
     echo "[info] start jeiba......"
 }
 
+function start_test() {
+    echo "[info] start testing......"
+    $PIXHACK_PATH/crawler/pixnet/test/test_pixnetdb.py
+}
+
 function argument_echo ()
 {
     echo "[PixHack]
     Usage: `basename $0` {arg}
     --crawler
     --jieba
+    --test
     "
 }
 
@@ -38,6 +44,9 @@ case "$1" in
         ;;
     --jieba)
         start_jieba
+        ;;
+    --test)
+        start_test
         ;;
     *)
         argument_echo
