@@ -14,6 +14,11 @@ Team member:
 Use [scrapy](https://github.com/scrapy/scrapy) to download pixnet blog's articles.
 
 ```sh
-cd crawler/
-scrapy crawl blog
+./pixhack.sh --crawler
+```
+
+## Start jeiba
+
+```sh
+./pixhack.sh --jeiba
 ```
