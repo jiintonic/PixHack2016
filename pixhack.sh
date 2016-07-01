@@ -25,7 +25,11 @@ function start_jieba() {
 
 function start_test() {
     echo "[info] start testing......"
-    $PIXHACK_PATH/crawler/pixnet/test/test_pixnetdb.py
+    for file in $PIXHACK_PATH/crawler/pixnet/test/*.py
+    do
+        python $file
+    done
+
 }
 
 function argument_echo ()
