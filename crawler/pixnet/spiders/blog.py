@@ -5,8 +5,8 @@ import time
 import datetime
 from BeautifulSoup import BeautifulSoup
 from BeautifulSoup import Tag
-
 from pixnet.items import PixnetItem
+from pixnet.pixnetdb import PixnetDB
 
 target_category = [
     u"國內旅遊",
@@ -22,6 +22,7 @@ class BlogSpider(scrapy.Spider):
     start_urls = (
         pixnet_url_prefix + '/blog',
     )
+    db = PixnetDB()
 
     def parse(self, response):
         for path in response.xpath('//ul[@id="navigation"]/li/ul/li'):
@@ -29,16 +30,37 @@ class BlogSpider(scrapy.Spider):
             cat_name = path.xpath('a/text()').extract().pop()
 
             if cat_name in target_category:
-                print cat_name, cat_url
                 yield scrapy.Request(self.pixnet_url_prefix + cat_url, callback = self.parse_category)
 
     def parse_category(self, response):
         for path in response.xpath('//div[@class="box-body"]/div[1]'):
             cat_url = path.xpath('a/@href').extract().pop()
-            print cat_url
             yield scrapy.Request(cat_url, callback = self.parse_blog_content)
 
     def parse_blog_content(self, response):
+        if self._is_secret_aritcle:
+            return
+
+        item = self._get_blog_item(response)
+        #yield item
+
+        link = self._get_next_link(response)
+        if link is not "":
+            print "[NEXT]" + link
+            yield scrapy.Request(link, callback = self.parse_blog_content)
+
+        link = self._get_prev_link(response)
+        if link is not "":
+            print "[PREV]" + link
+            yield scrapy.Request(link, callback = self.parse_blog_content)
+
+    def _is_secret_aritcle(self, soup):
+        if soup.find('ul', {"class" : "secret-code-notify"}):
+            return True
+        else:
+            return False
+
+    def _get_blog_item(self, response):
         item = PixnetItem()
 
         item['date'] = self._extract_publish_timestamp(response)
@@ -53,7 +75,31 @@ class BlogSpider(scrapy.Spider):
         item['site_name'] = self._extract_site_name(response)
         item['content'] = self._extract_content(response)
 
-        yield item
+        return item
+
+    def _get_next_link(self, soup):
+        find = soup.find('a', {"class": "quick-nav--next"})
+        if find:
+            link = find.get("href")
+        else:
+            link = ""
+
+        if not self.db.exist_article_link(link):
+            return link
+        else:
+            return ""
+
+    def _get_prev_link(self, soup):
+        find = soup.find('a', {"class": "quick-nav--pre"})
+        if find:
+            link = find.get("href")
+        else:
+            link = ""
+
+        if not self.db.exist_article_link(link):
+            return link
+        else:
+            return ""
 
     def _extract_publish_timestamp(self, response):
         pub_month = response.xpath('//span[@class="month"]/text()').extract_first()
@@ -132,7 +178,6 @@ class BlogSpider(scrapy.Spider):
                 continue
             else:
                 article += raw_text
-                print raw_text
 
         return article
 

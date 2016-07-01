@@ -11,10 +11,9 @@ class PixnetDB(object):
     }
 
     def __init__(self):
-        self.dbname = 'pixnet.db'
-        self.sql_conn = sqlite3.connect(self.dbname)
+        self.db_name = 'pixnet.db'
+        self.sql_conn = sqlite3.connect(self.db_name)
         self._create_tables(self.sql_conn.cursor())
-
 
     def _create_tables(self, cursor):
         for name, filename in self.sql_files.items():
@@ -35,6 +34,7 @@ class PixnetDB(object):
 
     def exist_article_link(self, link):
         c = self.sql_conn.cursor()
+        
         c.execute("SELECT link FROM pixnet_aritcles WHERE link = ?", (link, ))
 
         data = c.fetchone()
