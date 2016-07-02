@@ -1,7 +1,6 @@
 #! /bin/bash
 
-PIXHACK_PATH=`pwd`
-
+export PIXHACK_PATH=`pwd`
 export PYTHONPATH="${PYTHONPATH}":$PIXHACK_PATH
 export SQL_PATH=$PIXHACK_PATH/sql
 

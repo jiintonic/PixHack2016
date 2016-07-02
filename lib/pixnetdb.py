@@ -10,9 +10,16 @@ class PixnetDB(object):
         "pixnet_authors": "create_authors_table.sql"
     }
 
+    db_name = 'pixnet.db'
+
     def __init__(self):
-        self.db_name = 'pixnet.db'
-        self.sql_conn = sqlite3.connect(self.db_name)
+        pixhak_path = os.environ.get('PIXHACK_PATH')
+        if pixhak_path:
+            db_path = os.path.join(pixhak_path, self.db_name)
+        else:
+            db_path = db_name
+
+        self.sql_conn = sqlite3.connect(db_path)
         self._create_tables(self.sql_conn.cursor())
 
     def _create_tables(self, cursor):
@@ -21,14 +28,13 @@ class PixnetDB(object):
 
     def _create_table(self, tablename, filename, cursor):
         logging.info("Create table %s.", tablename)
-        with open(self._getSQLFile(filename), 'r') as f:
+        with open(self._get_sql_file(filename), 'r') as f:
             sqlContext = f.read()
 
         cursor.execute(sqlContext)
         self.sql_conn.commit()
 
-    # Create Sqlite Tables
-    def _getSQLFile(self, name):
+    def _get_sql_file(self, name):
         sql_dir = os.environ.get('SQL_PATH')
         if sql_dir:
             return os.path.join(sql_dir, name)
