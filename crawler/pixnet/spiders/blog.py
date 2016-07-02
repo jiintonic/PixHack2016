@@ -38,18 +38,18 @@ class BlogSpider(scrapy.Spider):
             yield scrapy.Request(cat_url, callback = self.parse_blog_content)
 
     def parse_blog_content(self, response):
-        if self._is_secret_aritcle:
-            return
+        soup = BeautifulSoup(response.body)
 
-        item = self._get_blog_item(response)
-        #yield item
+        item = self._get_blog_item(response, soup)
+        if item is not None:
+            yield item
 
-        link = self._get_next_link(response)
+        link = self._get_next_link(soup)
         if link is not "":
             print "[NEXT]" + link
             yield scrapy.Request(link, callback = self.parse_blog_content)
 
-        link = self._get_prev_link(response)
+        link = self._get_prev_link(soup)
         if link is not "":
             print "[PREV]" + link
             yield scrapy.Request(link, callback = self.parse_blog_content)
@@ -60,9 +60,11 @@ class BlogSpider(scrapy.Spider):
         else:
             return False
 
-    def _get_blog_item(self, response):
-        item = PixnetItem()
+    def _get_blog_item(self, response, soup):
+        if self._is_secret_aritcle(soup):
+            return None
 
+        item = PixnetItem()
         item['date'] = self._extract_publish_timestamp(response)
         item['title'] = self._extract_title(response)
         item['article_id'] = self._extract_article_id(response)
@@ -182,14 +184,17 @@ class BlogSpider(scrapy.Spider):
         return article
 
     def _need_skip_line(self, soup):
-        if type(soup.contents[0]) is Tag:
-            if soup.contents[0].name == 'a' :
-                return True
-            elif soup.contents[0].name == 'img':
+        try:
+            if type(soup.contents[0]) is Tag:
+                if soup.contents[0].name == 'a' :
+                    return True
+                elif soup.contents[0].name == 'img':
+                    return True
+                else:
+                    return False
+            elif soup.find('script') is not None:
                 return True
             else:
                 return False
-        elif soup.find('script') is not None:
-            return True
-        else:
+        except Exception as e:
             return False

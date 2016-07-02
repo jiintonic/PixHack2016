@@ -34,7 +34,7 @@ class PixnetDB(object):
 
     def exist_article_link(self, link):
         c = self.sql_conn.cursor()
-        
+
         c.execute("SELECT link FROM pixnet_aritcles WHERE link = ?", (link, ))
 
         data = c.fetchone()
@@ -62,6 +62,11 @@ class PixnetDB(object):
         else:
             c.execute("INSERT INTO pixnet_aritcles VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
             self.sql_conn.commit()
+
+    def get_article_count(self):
+        c = self.sql_conn.cursor()
+        c.execute("SELECT count(*) FROM pixnet_aritcles")
+        return c.fetchone()
 
     def get_all_aritcle_data(self):
         c = self.sql_conn.cursor()
@@ -120,6 +125,11 @@ class PixnetDB(object):
         c = self.sql_conn.cursor()
         sql = "SELECT * FROM pixnet_authors WHERE author_id = ?"
         c.execute(sql, (author_id, ))
+        return c.fetchone()
+
+    def get_author_count(self):
+        c = self.sql_conn.cursor()
+        c.execute("SELECT count(*) FROM pixnet_authors")
         return c.fetchone()
 
     def update_author_data(self, data):
