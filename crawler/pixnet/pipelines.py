@@ -58,7 +58,7 @@ class SqlitePipeline(object):
     def process_item(self, item, spider):
         self._store_aritcle(item)
         self._store_author(item)
-        return item
+        #return item
 
     def open_spider(self, spider):
         try:

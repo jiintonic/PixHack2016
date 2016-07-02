@@ -46,12 +46,12 @@ class BlogSpider(scrapy.Spider):
         if article_list:
             for li in article_list.findAll('li'):
                 link = li.a.get('href')
-                #yield scrapy.Request(link, callback = self.parse_blog_content)
+                yield scrapy.Request(link, callback = self.parse_blog_content)
 
         # get othre rank page
         for i in range(2, 44):
             other_link = response.url + ('/hot/%d' % i)
-            #yield scrapy.Request(other_link, callback = self.parse_category_other)
+            yield scrapy.Request(other_link, callback = self.parse_category_other)
 
     def parse_category_other(self, response):
         soup = BeautifulSoup(response.body)
@@ -73,12 +73,12 @@ class BlogSpider(scrapy.Spider):
         link = self._get_next_link(soup)
         if link is not "":
             print "[NEXT]" + link
-            #yield scrapy.Request(link, callback = self.parse_blog_content)
+            yield scrapy.Request(link, callback = self.parse_blog_content)
 
         link = self._get_prev_link(soup)
         if link is not "":
             print "[PREV]" + link
-            #yield scrapy.Request(link, callback = self.parse_blog_content)
+            yield scrapy.Request(link, callback = self.parse_blog_content)
 
     def _is_secret_aritcle(self, soup):
         if soup.find('ul', {"class" : "secret-code-notify"}):
