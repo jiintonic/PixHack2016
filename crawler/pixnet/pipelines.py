@@ -11,6 +11,7 @@ import os
 import logging
 import time
 from lib.pixnetdb import PixnetDB
+from lib.lib import reverse_url
 
 class SqlitePipeline(object):
     db = None
@@ -26,7 +27,7 @@ class SqlitePipeline(object):
     def _store_aritcle(self, item):
         article_data = (
             item['title'],
-            item['link'],
+            reverse_url(item['link']),
             item['content'],
             self._tags_to_string(item['tags']),
             item['pixnet_category'],
@@ -48,7 +49,7 @@ class SqlitePipeline(object):
             0,
             time.time(),
             time.time(),
-            item['link']
+            reverse_url(item['link'])
         )
 
         self.db.store_author_data(author_data)

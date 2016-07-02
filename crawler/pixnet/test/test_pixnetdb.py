@@ -5,6 +5,7 @@ import sys
 import unittest
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from lib.pixnetdb import PixnetDB
+from lib.lib import reverse_url
 
 class PixnetDBTest(unittest.TestCase):
 
@@ -14,7 +15,7 @@ class PixnetDBTest(unittest.TestCase):
     def test_modify_article_data(self):
         article_data = (
             'test_title',
-            'http://test.link.com/',
+            reverse_url('http://test.link.com/'),
             'This is content of test article.',
             'tag1,tag2',
             'test_category',
@@ -24,7 +25,7 @@ class PixnetDBTest(unittest.TestCase):
             'raix',
             12345678
         )
-        article_link = article_data[1]
+        article_link = reverse_url(article_data[1])
         article_content = article_data[2]
         article_id = article_data[7]
 
@@ -56,7 +57,7 @@ class PixnetDBTest(unittest.TestCase):
             0,
             12345678,
             12345678,
-            'http://test.link.com/'
+            reverse_url('http://test.link.com/')
         )
         author_id = author_data[0]
 

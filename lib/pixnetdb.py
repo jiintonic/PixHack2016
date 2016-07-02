@@ -3,6 +3,7 @@ import os
 import re
 import logging
 import time
+from lib import reverse_url
 
 class PixnetDB(object):
     sql_files = {
@@ -43,9 +44,9 @@ class PixnetDB(object):
             return os.path.join(dirname, 'sql', name)
 
     def exist_article_link(self, link):
+        rlink = reverse_url(link)
         c = self.sql_conn.cursor()
-
-        c.execute("SELECT link FROM pixnet_aritcles WHERE link = ?", (link, ))
+        c.execute("SELECT link FROM pixnet_aritcles WHERE link = ?", (rlink, ))
 
         data = c.fetchone()
         if data is None:
