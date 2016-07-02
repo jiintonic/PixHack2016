@@ -1,8 +1,9 @@
 #! /bin/bash
 
 PIXHACK_PATH=`pwd`
+
 export PYTHONPATH="${PYTHONPATH}":$PIXHACK_PATH
-echo $PYTHONPATH
+export SQL_PATH=$PIXHACK_PATH/sql
 
 os=`uname -s`
 if [ $os == "Linux" ]; then

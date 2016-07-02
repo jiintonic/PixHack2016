@@ -29,8 +29,12 @@ class PixnetDB(object):
 
     # Create Sqlite Tables
     def _getSQLFile(self, name):
-        dirname = os.path.dirname(os.path.realpath(__file__))
-        return os.path.join(dirname, '../sql', name)
+        sql_dir = os.environ.get('SQL_PATH')
+        if sql_dir:
+            return os.path.join(sql_dir, name)
+        else:
+            dirname = os.path.dirname(os.path.realpath(__file__))
+            return os.path.join(dirname, 'sql', name)
 
     def exist_article_link(self, link):
         c = self.sql_conn.cursor()
