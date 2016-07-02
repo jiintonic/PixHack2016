@@ -30,12 +30,38 @@ class BlogSpider(scrapy.Spider):
             cat_name = path.xpath('a/text()').extract().pop()
 
             if cat_name in target_category:
-                yield scrapy.Request(self.pixnet_url_prefix + cat_url, callback = self.parse_category)
+                yield scrapy.Request(self.pixnet_url_prefix + cat_url, callback = self.parse_category_top)
 
-    def parse_category(self, response):
-        for path in response.xpath('//div[@class="box-body"]/div[1]'):
-            cat_url = path.xpath('a/@href').extract().pop()
-            yield scrapy.Request(cat_url, callback = self.parse_blog_content)
+    def parse_category_top(self, response):
+        soup = BeautifulSoup(response.body)
+
+        # get rank 1
+        featured = soup.find('div', {"class": "featured"})
+        if featured:
+            feature_link =  featured.a.get('href')
+            yield scrapy.Request(feature_link, callback = self.parse_blog_content)
+
+        # get rank 2 ~
+        article_list = soup.find('ol', {"class": "article-list"})
+        if article_list:
+            for li in article_list.findAll('li'):
+                link = li.a.get('href')
+                yield scrapy.Request(link, callback = self.parse_blog_content)
+
+        # get othre rank page
+        for i in range(2, 44):
+            other_link = response.url + ('/hot/%d' % i)
+            yield scrapy.Request(other_link, callback = self.parse_category_other)
+
+    def parse_category_other(self, response):
+        soup = BeautifulSoup(response.body)
+
+        # get rank 2 ~
+        article_list = soup.find('ol', {"class": "article-list"})
+        if article_list:
+            for li in article_list.findAll('li'):
+                link = li.a.get('href')
+                yield scrapy.Request(link, callback = self.parse_blog_content)
 
     def parse_blog_content(self, response):
         soup = BeautifulSoup(response.body)
