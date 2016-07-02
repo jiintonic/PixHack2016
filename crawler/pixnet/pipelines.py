@@ -10,7 +10,7 @@ import sys
 import os
 import logging
 import time
-from pixnetdb import PixnetDB
+from lib.pixnetdb import PixnetDB
 
 class SqlitePipeline(object):
     db = None

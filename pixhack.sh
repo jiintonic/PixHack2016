@@ -1,6 +1,8 @@
 #! /bin/bash
 
 PIXHACK_PATH=`pwd`
+export PYTHONPATH="${PYTHONPATH}":$PIXHACK_PATH
+echo $PYTHONPATH
 
 os=`uname -s`
 if [ $os == "Linux" ]; then

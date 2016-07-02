@@ -6,7 +6,7 @@ import datetime
 from BeautifulSoup import BeautifulSoup
 from BeautifulSoup import Tag
 from pixnet.items import PixnetItem
-from pixnet.pixnetdb import PixnetDB
+from lib.pixnetdb import PixnetDB
 
 target_category = [
     u"國內旅遊",
