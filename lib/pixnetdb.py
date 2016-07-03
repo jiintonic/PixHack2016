@@ -91,6 +91,13 @@ class PixnetDB(object):
         c.execute(sql, (article_id, ))
         return c.fetchone()
 
+    def get_articles(self):
+        c = self.sql_conn.cursor()
+
+        sql = "SELECT content FROM pixnet_aritcles"
+        c.execute(sql)
+        return c.fetchall()
+
     def get_articles_by(self, column, condition):
         c = self.sql_conn.cursor()
         if re.match('[\w_]+', column):

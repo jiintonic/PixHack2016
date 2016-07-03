@@ -23,6 +23,7 @@ function start_crawler () {
 
 function start_jieba() {
     echo "[info] start jeiba......"
+    python $PIXHACK_PATH/jieba/Jieba.py
 }
 
 function start_test() {
