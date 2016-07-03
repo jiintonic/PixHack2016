@@ -6,6 +6,7 @@ import re
 import codecs
 import sys
 import os
+import threading
 from lib.pixnetdb import PixnetDB
 
 reload(sys)
@@ -45,12 +46,12 @@ def filter_words(content):
         tmp.append(line.strip())
     return tmp
 
-def write_file(content):
-    fileName = os.path.join(currentPath, 'test.txt')
+def write_file(content, fileName):
     with open(fileName, 'a+') as f:
         f.write(content)
 
-def start_jieba(data):
+def start_jieba(data, fileName):
+    f =  open(fileName, 'a+')
     for content in data:
         tmp = ''.join(filter_words(content))
         seg_words = jieba.cut(tmp, cut_all=False, HMM=True)
@@ -62,11 +63,56 @@ def start_jieba(data):
                 words.append(word.strip().encode('utf-8'))
             else:
                 pass
-        write_file(re.sub('\s+', ' ', ' '.join(words))+'\n')
+        f.write(re.sub('\s+', ' ', ' '.join(words))+'\n')
+    f.close()
+
+def partition_data(data, number):
+    if len(data) < number:
+        return [data]
+
+    n = len(data) / number
+    part_data = []
+    for i in range(number-1):
+        p = data[n*i: n*(i+1)]
+        part_data.append(p)
+
+    t = data[n*(number-1):]
+    part_data.append(t)
+    return part_data
+
+class JiebaThread(threading.Thread):
+    # Override run funciton
+    def __init__(self, data, fileName, threadName):
+        super(JiebaThread, self).__init__(name = threadName)
+        self.data = data
+        self.fileName = fileName
+
+    def run(self):
+        start_jieba(self.data, self.fileName)
+
+def start_jieba_thread(data, num):
+    # use 4 threads
+    pdata = partition_data(data, num)
+    th = []
+    for i in range(num):
+        print "Thread %d" % (i)
+        fileName = 'test%d.txt' % (i)
+        threadName = 'thread%d' % (i)
+        t = JiebaThread(pdata[i], fileName, threadName)
+        t.start()
+        th.append(t)
+
+    for t in th:
+        t.join()
 
 def main():
     articles = load_data()
-    start_jieba(articles)
+
+    # We need thread to process massive articles
+    if len(articles) > 100:
+        start_jieba_thread(articles, 4)
+    else:
+        start_jieba(articles)
 
 
 if __name__ == '__main__':
