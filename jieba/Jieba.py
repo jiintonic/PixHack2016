@@ -51,7 +51,7 @@ def write_file(content, fileName):
         f.write(content)
 
 def start_jieba(data, fileName):
-    f =  open(fileName, 'a+')
+    f =  open(os.path.join(currentPath, fileName), 'a+')
     for content in data:
         tmp = ''.join(filter_words(content))
         seg_words = jieba.cut(tmp, cut_all=False, HMM=True)
@@ -112,7 +112,7 @@ def main():
     if len(articles) > 100:
         start_jieba_thread(articles, 4)
     else:
-        start_jieba(articles)
+        start_jieba(articles, 'test.txt')
 
 
 if __name__ == '__main__':
