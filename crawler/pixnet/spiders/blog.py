@@ -12,7 +12,8 @@ target_category = [
     u"國內旅遊",
     u"國外旅遊",
     u"時尚流行",
-    u"美容彩妝"
+    u"美容彩妝",
+    u"美味食記"
 ]
 
 class BlogSpider(scrapy.Spider):
