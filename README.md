@@ -28,3 +28,9 @@ Use [scrapy](https://github.com/scrapy/scrapy) to download pixnet blog's article
 ```sh
 ./pixhack.sh --test
 ```
+
+## Show database counts
+
+```sh
+./pixhack.sh --count
+```
