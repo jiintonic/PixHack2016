@@ -35,10 +35,15 @@ function start_test() {
 
 }
 
+function count_articles() {
+    python $PIXHACK_PATH/count.py
+}
+
 function argument_echo ()
 {
     echo "[PixHack]
     Usage: `basename $0` {arg}
+    --count
     --crawler
     --jieba
     --test
@@ -46,6 +51,9 @@ function argument_echo ()
 }
 
 case "$1" in
+    --count)
+        count_articles
+        ;;
     --crawler)
         start_crawler
         ;;
