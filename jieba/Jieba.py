@@ -6,7 +6,8 @@ import re
 import codecs
 import sys
 import os
-import threading
+from multiprocessing import Process
+from multiprocessing import Pool
 from lib.pixnetdb import PixnetDB
 
 reload(sys)
@@ -82,30 +83,20 @@ def partition_data(data, number):
     part_data.append(t)
     return part_data
 
-class JiebaThread(threading.Thread):
-    # Override run funciton
-    def __init__(self, data, fileName, threadName):
-        super(JiebaThread, self).__init__(name = threadName)
-        self.data = data
-        self.fileName = fileName
-
-    def run(self):
-        start_jieba(self.data, self.fileName)
-
 def start_jieba_thread(data, num):
     # use 4 threads
     pdata = partition_data(data, num)
-    th = []
+    procs = []
     for i in range(num):
-        print "Thread %d" % (i)
+        print "Process %d" % (i)
         fileName = 'test%d.txt' % (i)
         threadName = 'thread%d' % (i)
-        t = JiebaThread(pdata[i], fileName, threadName)
-        t.start()
-        th.append(t)
+        p = Process(target=start_jieba, args=(pdata[i], fileName))
+        p.start()
+        procs.append(p)
 
-    for t in th:
-        t.join()
+    for p in procs:
+        p.join()
 
 def main():
     articles = load_data()
