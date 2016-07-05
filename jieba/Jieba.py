@@ -43,7 +43,7 @@ def filter_words(content):
         line = re.sub('[0-9.]', '', line)
         line = re.sub('www[\w./-_]+', '', line)
         line = re.sub('http[:\w./-_]+', '', line)
-        line = re.sub('[\w./-_]+com', line)
+        line = re.sub('[\w./-_@]+com', line)
         tmp.append(line.strip())
     return tmp
 
