@@ -55,6 +55,7 @@ def start_jieba(data, fileName):
     f =  open(os.path.join(currentPath, fileName), 'a+')
     for content in data:
         tmp = ''.join(filter_words(content))
+        tmp = tmp.lower()
         seg_words = jieba.cut(tmp, cut_all=False, HMM=True)
         # words: save content after jieba and remove stop words, words separate by blank
         words = []
