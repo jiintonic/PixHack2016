@@ -7,7 +7,6 @@ import codecs
 import sys
 import os
 from multiprocessing import Process
-from multiprocessing import Pool
 from lib.pixnetdb import PixnetDB
 
 reload(sys)
@@ -83,14 +82,13 @@ def partition_data(data, number):
     part_data.append(t)
     return part_data
 
-def start_jieba_thread(data, num):
-    # use 4 threads
+def start_jieba_process(data, num):
+    # use 4 process
     pdata = partition_data(data, num)
     procs = []
     for i in range(num):
         print "Process %d" % (i)
         fileName = 'test%d.txt' % (i)
-        threadName = 'thread%d' % (i)
         p = Process(target=start_jieba, args=(pdata[i], fileName))
         p.start()
         procs.append(p)
@@ -102,8 +100,9 @@ def main():
     articles = load_data()
 
     # We need thread to process massive articles
+    # Update: python thread not use full cpu, so change to process
     if len(articles) > 100:
-        start_jieba_thread(articles, 4)
+        start_jieba_process(articles, 4)
     else:
         start_jieba(articles, 'test.txt')
 
