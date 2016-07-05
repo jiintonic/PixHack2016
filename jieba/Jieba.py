@@ -44,6 +44,7 @@ def filter_words(content):
         line = re.sub('www[\w./-_]+', '', line)
         line = re.sub('http[:\w./-_]+', '', line)
         line = re.sub('[\w./-_@]+com', '', line)
+        line = re.sub('xd+', 'xd', line)
         tmp.append(line.strip())
     return tmp
 
@@ -54,8 +55,7 @@ def write_file(content, fileName):
 def start_jieba(data, fileName):
     f =  open(os.path.join(currentPath, fileName), 'a+')
     for content in data:
-        tmp = ''.join(filter_words(content))
-        tmp = tmp.lower()
+        tmp = ''.join(filter_words(content.lower()))
         seg_words = jieba.cut(tmp, cut_all=False, HMM=True)
         # words: save content after jieba and remove stop words, words separate by blank
         words = []
