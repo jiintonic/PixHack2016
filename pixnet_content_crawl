@@ -1,0 +1,26 @@
+data_path = '/hackathon-data/topic_3-crossword/2016-hackathon-qa.raw'
+import json
+from bs4 import BeautifulSoup
+import re
+
+raw = []
+with open(data_path, 'r') as f:
+    for line in f:
+        raw.append(json.loads(line))
+f = open('pixnet_content', 'a')
+for i in range(10):#len(raw)):
+    to_parse = raw[i]['content']
+    soup = BeautifulSoup(to_parse, 'html.parser')
+    try:
+        for hidden in soup.body.findAll(text=re.compile("CDATA")):
+            hidden.replaceWith("")
+    except:
+        pass
+    
+    text = soup.getText().encode("UTF-8")
+    try:
+        aaa = re.sub(r'\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*', '', text)
+    except:
+        pass
+    f.write(aaa)
+f.close()
